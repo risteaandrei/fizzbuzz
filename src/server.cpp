@@ -1,44 +1,20 @@
-#define ASIO_STANDALONE
-#include <asio.hpp>
+#include "server.h"
 
-class session: public std::enable_shared_from_this<session> {
-public:
-    session(asio::ip::tcp::socket socket): tcp_socket(std::move(socket)) {}
-    
-    void start() {
-        read();
-    }
+#include <iostream>
 
-private:
-    void read() {
-        auto self(shared_from_this());
+server::server(boost::asio::io_service& context, short const port)
+    : tcp_acceptor(context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+    , tcp_socket(context)
+{
+    std::cout << "server running on port " << port << std::endl;
+    accept();
+}
 
-        tcp_socket.async_read_some(
-            asio::buffer(data, data.size()),
-            [this, self](std::error_code const ec, std::size_t const length) {
-                if (!ec) {
-                    auto number = std::string(data.data(), length);
-                    auto rezult = fizzbuzz(std::atoi(number.c_str()));
-                    std::cout << number << "->" << resutl << std::endl;
-                    write(result);
-                }
-            }
-        );
-    }
-
-    void write(std::string_view response) {
-        auto self(shared_from_this());
-
-        tcp_socket.async_write_some(
-            asio::buffer(response.data(), response.length)),
-            [this, self](std::error_code const ec, std::size_t const) {
-                if (!ec) {
-                    read();
-                }
-            }
-        );
-    }
-
-    std::array<char, 1024> data;
-    asio:ip:tcp::socket tcp_socket;
+void server::accept() {
+    tcp_acceptor.async_accept(tcp_socket, [this](std::error_code ec) {
+        if (!ec) {
+            std::make_shared<session>(std::move(tcp_socket))->start();
+        }
+        accept();
+    });
 }
