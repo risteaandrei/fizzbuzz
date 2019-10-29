@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-server::server(boost::asio::io_service& context, short const port)
-    : tcp_acceptor(context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
-    , tcp_socket(context)
+server::server(boost::asio::io_service& service, short const port)
+    : tcp_acceptor(service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
+    , tcp_socket(service)
 {
     std::cout << "server running on port " << port << std::endl;
     accept();
