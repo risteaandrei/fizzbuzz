@@ -1,7 +1,6 @@
 #ifndef SESSION_H
 #define SESSION_H
 
-//#define ASIO_STANDALONE
 #include <boost/asio.hpp>
 
 class session: public std::enable_shared_from_this<session> {
