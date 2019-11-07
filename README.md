@@ -7,3 +7,8 @@ Setup:
 - Create docker image: `./create_image.sh`
 - Build the project: `./build.sh`
 - Run the tests: `./test.sh`
+
+
+
+ncat -l -k -p 50505 | ./client
+nc localhost 50505 <<< 5
