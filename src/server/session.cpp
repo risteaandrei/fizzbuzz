@@ -1,6 +1,7 @@
 #include "session.h"
 
 #include <iostream>
+#include <thread>
 
 void session::start() {
     read();
@@ -13,6 +14,10 @@ void session::read() {
         boost::asio::buffer(data, data.size()),
         [this, self](std::error_code const ec, std::size_t const length) {
             if (!ec) {
+                // simulate doing work
+                int wait = distribution(generator);
+                std::this_thread::sleep_for(std::chrono::seconds(wait));
+
                 auto number = std::string(data.data(), length);
                 auto result = fizzbuzz(std::atoi(number.c_str()));
                 std::cout << number << "->" << result << std::endl;
